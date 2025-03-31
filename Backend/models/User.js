@@ -1,13 +1,30 @@
-const db = require('../config/db'); // Adjust the path if necessary
+const db = require('../config/db'); // Import your DB config
 
 const User = {
-    findOne: (email, callback) => {
-        db.query('SELECT * FROM users WHERE email = ?', [email], (err, results) => {
-            if (err) return callback(err);
-            callback(null, results[0]); // Return the first user found
-        });
+    // Find user by email
+    findOne: async (email) => {
+        try {
+            const [results] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+            return results[0]; // Return the user object if found
+        } catch (error) {
+            console.error(error);
+            throw new Error('Database error');
+        }
     },
-    // You can add more methods for creating users, etc.
+
+    // Register a new user
+    create: async (username, email, password, role) => {
+        try {
+            const [results] = await db.execute(
+                'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+                [username, email, password, role]
+            );
+            return results;
+        } catch (error) {
+            console.error(error);
+            throw new Error('Database error');
+        }
+    }
 };
 
 module.exports = User;

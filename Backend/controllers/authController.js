@@ -1,18 +1,40 @@
-const db = require('../config/db');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const db = require('../config/db');
+const dotenv = require('dotenv');
 
-exports.login = (req, res) => {
-    const { username, password } = req.body;
-    db.query('SELECT * FROM users WHERE username = ?', [username], (err, results) => {
-        if (err) return res.status(500).send(err);
-        if (results.length === 0) return res.status(404).send('User  not found');
+dotenv.config();
 
-        const user = results[0];
-        const isValidPassword = bcrypt.compareSync(password, user.password);
-        if (!isValidPassword) return res.status(401).send('Invalid password');
+const authController = {
+    login: async (req, res) => {
+        const { email, password } = req.body;
 
-        const token = jwt.sign({ id: user.id, role: user.role }, 'your_jwt_secret', { expiresIn: '1h' });
-        res.json({ auth: true, token });
-    });
+        try {
+            const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+            if (users.length === 0) {
+                return res.status(400).json({ message: 'Invalid email or password' });
+            }
+
+            const user = users[0];
+
+            const isValidPassword = await bcrypt.compare(password, user.password);
+            if (!isValidPassword) {
+                return res.status(400).json({ message: 'Invalid email or password' });
+            }
+
+            // Generate JWT with role
+            const token = jwt.sign(
+                { id: user.id, role: user.role },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+
+            res.json({ token, role: user.role });
+        } catch (error) {
+            res.status(500).json({ message: 'Server error' });
+        }
+    },
 };
+
+module.exports = authController;
