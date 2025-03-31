@@ -1,94 +1,119 @@
-const db = require('../config/db'); // Adjust the path to your database config
+const db = require("../config/db");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+
+// Middleware to verify token and role
+const verifyToken = (req, res, next) => {
+    const token = req.header("Authorization");
+    if (!token) return res.status(403).json({ message: "Access denied. No token provided." });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Invalid token." });
+    }
+};
 
 const SellerController = {
-    getSellers: (req, res) => {
-        db.query('SELECT * FROM sellers', (err, results) => {
+    // ✅ Get all sellers (Accessible to all authenticated users)
+    getSellers: [verifyToken, (req, res) => {
+        db.query("SELECT * FROM sellers", (err, results) => {
             if (err) {
-                console.error('Error fetching sellers:', err);
-                return res.status(500).json({ message: 'Error fetching sellers' });
+                console.error("Error fetching sellers:", err);
+                return res.status(500).json({ message: "Error fetching sellers" });
             }
             res.json(results);
         });
-    },
+    }],
 
-    addSeller: (req, res) => {
+    // ✅ Add a new seller (Admin only)
+    addSeller: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { companyname, concernedperson, address, contact, email, gstno } = req.body;
     
-        console.log('Received request body:', req.body); // Check the received data
+        console.log("Received request body:", req.body);
     
         if (!companyname || !concernedperson || !address || !contact || !email || !gstno) {
-            return res.status(400).json({ message: 'All fields are required' });
+            return res.status(400).json({ message: "All fields are required" });
         }
     
-        // Check if the email already exists
-        db.query('SELECT * FROM sellers WHERE email = ?', [email], (err, results) => {
+        db.query("SELECT * FROM sellers WHERE email = ?", [email], (err, results) => {
             if (err) {
-                console.error('Error checking email:', err);
-                return res.status(500).json({ message: 'Error checking email' });
+                console.error("Error checking email:", err);
+                return res.status(500).json({ message: "Error checking email" });
             }
     
             if (results.length > 0) {
-                return res.status(400).json({ message: 'Email already exists' });
+                return res.status(400).json({ message: "Email already exists" });
             }
     
-            // Proceed with inserting the new seller if the email is unique
             db.query(
-                'INSERT IGNORE INTO sellers (companyname, concernedperson, address, contact, email, gstno) VALUES (?, ?, ?, ?, ?, ?)', 
+                "INSERT INTO sellers (companyname, concernedperson, address, contact, email, gstno) VALUES (?, ?, ?, ?, ?, ?)", 
                 [companyname, concernedperson, address, contact, email, gstno], 
                 (err, results) => {
                     if (err) {
-                        console.error('Error adding seller:', err);
-                        return res.status(500).json({ message: 'Error adding seller' });
+                        console.error("Error adding seller:", err);
+                        return res.status(500).json({ message: "Error adding seller" });
                     }
-                    if (results.affectedRows === 0) {
-                        return res.status(400).json({ message: 'Email already exists' });
-                    }
-                    console.log('Seller added:', results);
                     res.status(201).json({ id: results.insertId, companyname });
                 }
             );            
         });
-    },
+    }],
 
-    
+    // ✅ Update an existing seller (Admin only)
+    updateSeller: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
 
-    updateSeller: (req, res) => {
         const { id } = req.params;
-        const { name, contact, email } = req.body;
+        const { companyname, contact, email } = req.body;
 
-        if (!name || !contact || !email) {
-            return res.status(400).json({ message: 'All fields are required' });
+        if (!companyname || !contact || !email) {
+            return res.status(400).json({ message: "All fields are required" });
         }
 
         db.query(
-            'UPDATE sellers SET name = ?, contact = ?, email = ? WHERE id = ?', 
-            [name, contact, email, id], 
+            "UPDATE sellers SET companyname = ?, contact = ?, email = ? WHERE id = ?", 
+            [companyname, contact, email, id], 
             (err, results) => {
                 if (err) {
-                    console.error('Error updating seller:', err);
-                    return res.status(500).json({ message: 'Error updating seller' });
+                    console.error("Error updating seller:", err);
+                    return res.status(500).json({ message: "Error updating seller" });
                 }
                 if (results.affectedRows === 0) {
-                    return res.status(404).json({ message: 'Seller not found' });
+                    return res.status(404).json({ message: "Seller not found" });
                 }
-                res.json({ message: 'Seller updated successfully' });
+                res.json({ message: "Seller updated successfully" });
             }
         );
-    },
+    }],
 
-    deleteSeller: (req, res) => {
+    // ✅ Delete a seller (Admin only)
+    deleteSeller: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { id } = req.params;
-        db.query('DELETE FROM sellers WHERE id = ?', [id], (err, results) => {
+        db.query("DELETE FROM sellers WHERE id = ?", [id], (err, results) => {
             if (err) {
-                console.error('Error deleting seller:', err);
-                return res.status(500).json({ message: 'Error deleting seller' });
+                console.error("Error deleting seller:", err);
+                return res.status(500).json({ message: "Error deleting seller" });
             }
             if (results.affectedRows === 0) {
-                return res.status(404).json({ message: 'Seller not found' });
+                return res.status(404).json({ message: "Seller not found" });
             }
-            res.json({ message: 'Seller deleted successfully' });
+            res.json({ message: "Seller deleted successfully" });
         });
-    }
+    }]
 };
 
 module.exports = SellerController;

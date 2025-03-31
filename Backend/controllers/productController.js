@@ -1,8 +1,25 @@
 const db = require("../config/db");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
+
+// Middleware to verify token and role
+const verifyToken = (req, res, next) => {
+    const token = req.header("Authorization");
+    if (!token) return res.status(403).json({ message: "Access denied. No token provided." });
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Invalid token." });
+    }
+};
 
 const ProductController = {
-    // ✅ Get all products
-    getProducts: (req, res) => {
+    // ✅ Get all products (Accessible to all authenticated users)
+    getProducts: [verifyToken, (req, res) => {
         db.query("SELECT * FROM products", (err, results) => {
             if (err) {
                 console.error("Error fetching products:", err.sqlMessage);
@@ -10,10 +27,14 @@ const ProductController = {
             }
             res.json(results);
         });
-    },
+    }],
 
-    // ✅ Add a new product
-    addProduct: (req, res) => {
+    // ✅ Add a new product (Admin only)
+    addProduct: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { productname, category, producttype, modelno, description, image, unit, price, status, quantity } = req.body;
 
         if (!productname || !price || !quantity) {
@@ -32,10 +53,14 @@ const ProductController = {
                 res.status(201).json({ id: results.insertId, productname });
             }
         );
-    },
+    }],
 
-    // ✅ Update an existing product
-    updateProduct: (req, res) => {
+    // ✅ Update an existing product (Admin only)
+    updateProduct: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { id } = req.params;
         const { productname, category, producttype, modelno, description, image, unit, price, status, quantity } = req.body;
 
@@ -58,10 +83,14 @@ const ProductController = {
                 res.json({ message: "Product updated successfully" });
             }
         );
-    },
+    }],
 
-    // ✅ Delete a product
-    deleteProduct: (req, res) => {
+    // ✅ Delete a product (Admin only)
+    deleteProduct: [verifyToken, (req, res) => {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied. Admins only." });
+        }
+
         const { id } = req.params;
         db.query("DELETE FROM products WHERE id = ?", [id], (err, results) => {
             if (err) {
@@ -73,7 +102,7 @@ const ProductController = {
             }
             res.json({ message: "Product deleted successfully" });
         });
-    }
+    }]
 };
 
 module.exports = ProductController;

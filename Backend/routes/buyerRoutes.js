@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
-const BuyerController = require('../controllers/buyerController'); // Ensure this path is correct
+const BuyerController = require('../controllers/BuyerController');
+const authorize = require('../middlewares/authMiddleware');
 
-// Buyer Routes
-router.get('/', BuyerController.getBuyers); // Correctly reference the method
-router.post('/', BuyerController.addBuyer); // Correctly reference the method
-router.put('/:id', BuyerController.updateBuyer); // Correctly reference the method
-router.delete('/:id', BuyerController.deleteBuyer); // Correctly reference the method
+// Only Admin can add, update, or delete buyers
+router.post('/', authorize(['admin']), BuyerController.addBuyer);
+router.put('/:id', authorize(['admin']), BuyerController.updateBuyer);
+router.delete('/:id', authorize(['admin']), BuyerController.deleteBuyer);
+
+// Users & Admins can view buyers
+router.get('/', authorize(['admin', 'user']), BuyerController.getBuyers);
 
 module.exports = router;
