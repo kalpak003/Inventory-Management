@@ -1,9 +1,6 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { BuyerComponent } from './dashboard/buyer/buyer.component';
-import { SellerComponent } from './dashboard/seller/seller.component';
-import { ProductsComponent } from './dashboard/products/products.component';
+import { AuthGuard } from './auth.guard'; // Import the guard
 
 export const routes: Routes = [
   { 
@@ -19,18 +16,16 @@ export const routes: Routes = [
     path: 'register', 
     loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent) 
   },
-  { 
-    path: '**', 
-    redirectTo: 'login' 
-  },
+
   { 
     path: 'dashboard', 
-    component: DashboardComponent,
+    loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [AuthGuard], // Protect dashboard
     children: [
       { path: '', redirectTo: 'buyer', pathMatch: 'full' },
-      { path: 'buyer', component: BuyerComponent },
-      { path: 'seller', component: SellerComponent },
-      { path: 'products', component: ProductsComponent }
+      { path: 'buyer', loadComponent: () => import('./dashboard/buyer/buyer.component').then(m => m.BuyerComponent) },
+      { path: 'seller', loadComponent: () => import('./dashboard/seller/seller.component').then(m => m.SellerComponent) },
+      { path: 'products', loadComponent: () => import('./dashboard/products/products.component').then(m => m.ProductsComponent) }
     ]
   }
 ];
