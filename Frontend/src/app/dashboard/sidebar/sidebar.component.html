@@ -1,0 +1,11 @@
+<!-- sidebar.component.html -->
+<mat-nav-list class="sidebar">
+    <div class="sidebar-header">
+      <h3>Menu</h3>
+    </div>
+    <mat-divider></mat-divider>
+    <a mat-list-item *ngFor="let item of menuItems" [routerLink]="item.route" routerLinkActive="active">
+      <mat-icon matListItemIcon>{{item.icon}}</mat-icon>
+      <span matListItemTitle>{{item.name}}</span>
+    </a>
+  </mat-nav-list>
