@@ -19,21 +19,21 @@ export class AuthService {
     return this.tokenSubject.value;
   }
 
-  login(email: string, password: string): Observable<string> {
+  login(email: string, password: string): Observable<{ token: string }> {
     const body = { email, password };
-    console.log('Sending login request with:', body); // Debug log
+    console.log('Sending login request with:', body);
     
-    return this.http.post<string>(`${this.apiUrl}/login`, body).pipe(
+    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, body).pipe(
       tap({
-        next: (token) => {
-          console.log('Received token:', token); // Debug log
-          if (token) {
-            localStorage.setItem('token', token);
-            this.router.navigate(['/dashboard']);
+        next: (response) => {
+          console.log('Received response:', response);
+          if (response.token) {
+            localStorage.setItem('token', response.token);
+            this.tokenSubject.next(response.token);
           }
         },
         error: (err) => {
-          console.error('Login error:', err); // Debug log
+          console.error('Login error:', err);
         }
       })
     );

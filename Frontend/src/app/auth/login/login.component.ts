@@ -45,22 +45,24 @@ export class LoginComponent {
     });
   }
 
-onSubmit(): void {
-  if (this.loginForm.valid) {
-    this.isLoading = true;
-    this.authService.login(
-      this.loginForm.value.username!,
-      this.loginForm.value.password!
-    ).subscribe({
-      next: () => {
-        // Remove dashboard navigation or replace with your desired route
-        // this.router.navigate(['/some-other-route']);
-      },
-      error: (err) => {
-        this.errorMessage = err.error.message || 'Login failed';
-        this.isLoading = false;
-      }
-    });
+  onSubmit(): void {
+    if (this.loginForm.valid) {
+      this.isLoading = true;
+      this.authService.login(
+        this.loginForm.value.username!,
+        this.loginForm.value.password!
+      ).subscribe({
+        next: (response) => {
+          console.log("Login successful, navigating to dashboard...");
+          this.isLoading = false;
+          this.router.navigate(['/dashboard']); // Ensure navigation happens here
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'Login failed';
+          console.error('Login error:', err);
+          this.isLoading = false;
+        }
+      });
   }
 }
 }
