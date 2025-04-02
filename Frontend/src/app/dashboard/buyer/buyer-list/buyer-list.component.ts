@@ -28,7 +28,7 @@ export class BuyerListComponent {
   buyers: any[] = [];
   isLoading = true;
   isAdmin = false; // Add this property
-
+  selectedBuyerId: number | null = null;
 
   constructor(
     private buyerService: BuyerService,
@@ -70,4 +70,11 @@ export class BuyerListComponent {
     this.router.navigate(['/dashboard/buyer/add']);
   }
 
+  editBuyer(buyerId: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation(); // Prevents the click event from triggering the card click
+    }
+    this.router.navigate(['/dashboard/buyer', buyerId, 'edit']);
+  }
+  
 }

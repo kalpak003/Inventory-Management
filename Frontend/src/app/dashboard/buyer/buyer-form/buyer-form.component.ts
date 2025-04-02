@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-buyer-form',
@@ -28,14 +29,14 @@ export class BuyerFormComponent implements OnInit {
   buyerForm: FormGroup;
   isEditMode = false;
   buyerId: number | null = null;
-  buyers: any[] = [];
-  isLoading = true;
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
     private buyerService: BuyerService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {
     this.buyerForm = this.fb.group({
       company_name: ['', Validators.required],
@@ -52,39 +53,48 @@ export class BuyerFormComponent implements OnInit {
       if (params['id']) {
         this.isEditMode = true;
         this.buyerId = +params['id'];
-        this.loadBuyers();
+        this.loadBuyerData(this.buyerId);
       }
     });
   }
 
-  loadBuyers(): void {
-    console.log('Loading buyers...'); // Debug log
-    this.buyerService.getBuyers().subscribe({
-      next: (data) => {
-        this.buyers = data;
-        this.isLoading = false;
-        console.log('Buyers loaded successfully', data); // Debug log
-      },
-      error: (err) => {
-        console.error('Failed to load buyers:', err); // Debug log
-        this.isLoading = false;
-      }
+  loadBuyerData(id: number): void {
+    this.buyerService.getBuyerById(id).subscribe({
+      next: (data) => this.buyerForm.patchValue(data),
+      error: (err) => console.error('Error loading buyer:', err)
     });
   }
 
   onSubmit(): void {
     if (this.buyerForm.valid) {
-      const buyerData = this.buyerForm.value;
-      this.buyerService.createBuyer(buyerData).subscribe({
+      this.isLoading = true;
+      const formData = this.buyerForm.value;
+
+      const operation = this.isEditMode
+        ? this.buyerService.updateBuyer(this.buyerId!, formData)
+        : this.buyerService.createBuyer(formData);
+
+      operation.subscribe({
         next: (response) => {
-          console.log('Buyer Added:', response);
+          const message = this.isEditMode 
+            ? 'Buyer updated successfully!' 
+            : 'Buyer added successfully!';
+          this.snackBar.open(message, 'Close', { duration: 3000 });
           this.router.navigate(['/dashboard/buyer']);
         },
-        error: (err) => console.error('Error adding buyer:', err)
+        error: (err) => {
+          this.snackBar.open(err.error?.message || 'Operation failed', 'Close', { 
+            duration: 5000,
+            panelClass: ['error-snackbar']
+          });
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+        }
       });
     }
   }
-  
 
   navigateToBuyerList(): void {
     this.router.navigate(['/dashboard/buyer']);
