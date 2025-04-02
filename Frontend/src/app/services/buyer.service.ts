@@ -84,7 +84,7 @@ export class BuyerService {
   }
 
   deleteBuyer(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, this.getHeaders())
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+  
 }

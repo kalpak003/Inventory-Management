@@ -1,14 +1,15 @@
-// buyer-list.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { BuyerService } from '../../../services/buyer.service';
-import { CommonModule } from '@angular/common'; // Add this import
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-buyer-list',
@@ -16,24 +17,26 @@ import { AuthService } from '../../../services/auth.service';
   styleUrls: ['./buyer-list.component.css'],
   standalone: true,
   imports: [
-    CommonModule, // Add this
+    CommonModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    RouterModule
+    RouterModule,
+    MatDialogModule
   ],
 })
 export class BuyerListComponent {
   buyers: any[] = [];
   isLoading = true;
-  isAdmin = false; // Add this property
+  isAdmin = false;
   selectedBuyerId: number | null = null;
 
   constructor(
     private buyerService: BuyerService,
     private router: Router,
     private authService: AuthService,
+    private dialog: MatDialog // Dialog for delete confirmation
   ) {}
 
   ngOnInit(): void {
@@ -63,7 +66,7 @@ export class BuyerListComponent {
   }
 
   viewDetails(id: number): void {
-    this.router.navigate([`/dashboard/buyer/${id}`]); // Correct routing format
+    this.router.navigate([`/dashboard/buyer/${id}`]);
   }
   
   addBuyer(): void {
@@ -72,9 +75,40 @@ export class BuyerListComponent {
 
   editBuyer(buyerId: number, event?: Event): void {
     if (event) {
-      event.stopPropagation(); // Prevents the click event from triggering the card click
+      event.stopPropagation(); // Prevents clicking card
     }
     this.router.navigate(['/dashboard/buyer', buyerId, 'edit']);
+  }
+
+  confirmDelete(buyerId: number, event?: Event): void {
+    if (event) {
+      event.stopPropagation(); // Prevents clicking card
+    }
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: {
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to delete this buyer?'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.deleteBuyer(buyerId);
+      }
+    });
+  }
+
+  deleteBuyer(buyerId: number): void {
+    this.buyerService.deleteBuyer(buyerId).subscribe({
+      next: () => {
+        this.buyers = this.buyers.filter(buyer => buyer.id !== buyerId);
+      },
+      error: err => {
+        console.error('Error deleting buyer:', err);
+      }
+    });
   }
   
 }
