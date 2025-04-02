@@ -77,7 +77,26 @@ const BuyerController = {
             console.error('Error deleting buyer:', err);
             res.status(500).json({ message: 'Error deleting buyer', error: err.message });
         }
+    },
+
+    getBuyerById: async (req, res) => {
+        console.log("Requested ID:", req.params.id); // Debugging Line
+        const { id } = req.params;
+        try {
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "Invalid ID format" });
+            }
+            const [results] = await db.execute('SELECT * FROM buyers WHERE id = ? LIMIT 1', [id]);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'Buyer not found' });
+            }
+            res.status(200).json(results[0]);
+        } catch (err) {
+            console.error('Error fetching buyer by ID:', err);
+            res.status(500).json({ message: 'Error fetching buyer by ID', error: err.message });
+        }
     }
+
 };
 
 module.exports = BuyerController;
