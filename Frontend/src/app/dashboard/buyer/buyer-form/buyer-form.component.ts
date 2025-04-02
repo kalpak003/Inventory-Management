@@ -75,16 +75,16 @@ export class BuyerFormComponent implements OnInit {
   onSubmit(): void {
     if (this.buyerForm.valid) {
       const buyerData = this.buyerForm.value;
-      const operation = this.isEditMode 
-        ? this.buyerService.updateBuyer(this.buyerId!, buyerData)
-        : this.buyerService.createBuyer(buyerData);
-
-      operation.subscribe(
-        () => this.router.navigate(['/dashboard/buyer']),
-        (error) => console.error('Error saving buyer:', error)
-      );
+      this.buyerService.createBuyer(buyerData).subscribe({
+        next: (response) => {
+          console.log('Buyer Added:', response);
+          this.router.navigate(['/dashboard/buyer']);
+        },
+        error: (err) => console.error('Error adding buyer:', err)
+      });
     }
   }
+  
 
   navigateToBuyerList(): void {
     this.router.navigate(['/dashboard/buyer']);

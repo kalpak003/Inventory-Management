@@ -38,6 +38,11 @@ export class BuyerListComponent {
 
   ngOnInit(): void {
     this.loadBuyers();
+    this.checkAdminStatus();
+  }
+
+  checkAdminStatus(): void {
+    this.isAdmin = this.authService.getCurrentUser()?.role === 'admin';
   }
 
   loadBuyers(): void {
@@ -53,16 +58,16 @@ export class BuyerListComponent {
     });
   }
 
-  checkAdminStatus(): void {
-    this.isAdmin = this.authService.getCurrentUser()?.role === 'admin';
+  navigateToAddBuyer(): void {
+    this.router.navigate(['/dashboard/buyer/add']);
   }
 
   viewDetails(id: number): void {
     this.router.navigate([`/dashboard/buyer/${id}`]); // Correct routing format
   }
   
-
   addBuyer(): void {
     this.router.navigate(['/dashboard/buyer/add']);
   }
+
 }

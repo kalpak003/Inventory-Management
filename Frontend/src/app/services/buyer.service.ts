@@ -13,6 +13,11 @@ interface Buyer {
   gstno: string;
 }
 
+interface UpdateBuyerResponse {
+  id: number;
+  company_name: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,9 +50,6 @@ export class BuyerService {
       })
     });
   }
-  
-  
-
   
   
   createBuyer(buyerData: any): Observable<any> {

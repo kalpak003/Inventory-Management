@@ -2,7 +2,11 @@
 <div class="buyer-container">
   <div class="header">
     <h2>Buyers</h2>
-    <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="addBuyer()">
+    <button *ngIf="isAdmin" 
+    mat-raised-button 
+            color="primary" 
+            (click)="addBuyer()"
+            class="add-button">
       <mat-icon>add</mat-icon> Add Buyer
     </button>
   </div>
