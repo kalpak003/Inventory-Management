@@ -11,4 +11,7 @@ router.delete('/:id', authorize(['admin']), BuyerController.deleteBuyer);
 // Users & Admins can view buyers
 router.get('/', authorize(['admin', 'user']), BuyerController.getBuyers);
 
+// Route to get a single buyer by ID
+router.get('/:id', authorize(['admin', 'user']), BuyerController.getBuyerById);
+
 module.exports = router;

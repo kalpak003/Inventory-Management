@@ -1,0 +1,51 @@
+/* buyer-list.component.css */
+.buyer-container {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.buyer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.buyer-card {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buyer-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* buyer-details.component.css */
+.details-container {
+  padding: 20px;
+}
+
+.details-card {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.detail-row {
+  display: flex;
+  margin: 10px 0;
+}
+
+.detail-label {
+  font-weight: bold;
+  width: 100px;
+}
+
+.detail-value {
+  flex: 1;
+}

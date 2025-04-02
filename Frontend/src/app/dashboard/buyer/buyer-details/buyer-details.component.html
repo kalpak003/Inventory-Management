@@ -1,0 +1,12 @@
+<div *ngIf="buyer">
+  <h2>Buyer Details</h2>
+  <p><strong>Company Name:</strong> {{ buyer.company_name }}</p>
+  <p><strong>Contact Person:</strong> {{ buyer.concernedperson }}</p>
+  <p><strong>Address:</strong> {{ buyer.address }}</p>
+  <p><strong>Contact:</strong> {{ buyer.contact }}</p>
+  <p><strong>Email:</strong> {{ buyer.email }}</p>
+  <p><strong>GST No:</strong> {{ buyer.gstno }}</p>
+</div>
+
+<!-- Debugging -->
+<p *ngIf="!buyer">Loading buyer details...</p>

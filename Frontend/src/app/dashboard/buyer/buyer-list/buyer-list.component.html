@@ -1,0 +1,23 @@
+<!-- buyer-list.component.html -->
+<div class="buyer-container">
+  <div class="header">
+    <h2>Buyers</h2>
+    <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="addBuyer()">
+      <mat-icon>add</mat-icon> Add Buyer
+    </button>
+  </div>
+
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+
+  <div class="buyer-list">
+    <mat-card *ngFor="let buyer of buyers" class="buyer-card" (click)="viewDetails(buyer.id)">
+      <mat-card-header>
+        <mat-card-title>{{ buyer.company_name }}</mat-card-title>
+        <mat-card-subtitle>{{ buyer.concernedperson }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ buyer.address }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

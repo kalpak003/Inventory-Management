@@ -60,4 +60,13 @@ export class AuthService {
   isAuthenticated(): boolean {
     return !!this.token;
   }
+
+  getCurrentUser(): any {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+  
+    const payload = JSON.parse(atob(token.split('.')[1])); // Decode JWT payload
+    return { role: payload.role }; // Assuming role is stored in JWT payload
+  }
+  
 }
