@@ -118,7 +118,29 @@ const SellerController = {
             console.error("Error deleting seller:", err);
             res.status(500).json({ message: "Error deleting seller" });
         }
+    }],
+
+    getSellerById: [verifyToken, async (req, res) => {
+        console.log("Requested Seller ID:", req.params.id); // Debugging Line
+        const { id } = req.params;
+    
+        try {
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "Invalid ID format" });
+            }
+    
+            const [results] = await db.query("SELECT * FROM sellers WHERE id = ? LIMIT 1", [id]);
+    
+            if (results.length === 0) {
+                return res.status(404).json({ message: "Seller not found" });
+            }
+    
+            res.status(200).json(results[0]);
+        } catch (err) {
+            console.error("Error fetching seller by ID:", err);
+            res.status(500).json({ message: "Error fetching seller by ID", error: err.message });
+        }
     }]
-};
+}    
 
 module.exports = SellerController;
