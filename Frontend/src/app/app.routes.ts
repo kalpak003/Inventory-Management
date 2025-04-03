@@ -4,6 +4,9 @@ import { AuthGuard } from './auth.guard';
 import { SellerListComponent } from './dashboard/seller/seller-list/seller-list.component';
 import { SellerFormComponent } from './dashboard/seller/seller-form/seller-form.component';
 import { SellerDetailsComponent } from './dashboard/seller/seller-details/seller-details.component';
+import { ProductListComponent } from './dashboard/products/product-list/product-list.component';
+import { ProductDetailComponent } from './dashboard/products/product-detail/product-detail.component';
+import { ProductFormComponent } from './../app/dashboard/products/product-form/product-form.component';
 
 
 export const routes: Routes = [
@@ -53,7 +56,16 @@ export const routes: Routes = [
       
       
 
-      { path: 'products', loadComponent: () => import('./dashboard/products/products.component').then(m => m.ProductsComponent) }
+      {
+        path: 'products',  // Matches navigation links
+        loadComponent: () => import('./dashboard/products/product-list/product-list.component').then(m => m.ProductListComponent),
+        children: [
+          { path: '', component: ProductListComponent }, // Product List View
+          { path: 'new', component: ProductFormComponent }, // Add New Product Form
+          { path: ':id', component: ProductDetailComponent }, // Product Details View
+          { path: ':id/edit', component: ProductFormComponent } // Edit Product Form
+        ]
+      }
     ]
   }
 ];

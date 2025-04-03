@@ -7,5 +7,6 @@ router.get('/', ProductController.getProducts); // Accessible to all authenticat
 router.post('/', ProductController.addProduct); // Admin only
 router.put('/:id', ProductController.updateProduct); // Admin only
 router.delete('/:id', ProductController.deleteProduct); // Admin only
+router.get("/:id", ProductController.getProductById); // Add the route to handle buyer fetching by ID
 
 module.exports = router;

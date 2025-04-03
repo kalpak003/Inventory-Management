@@ -1,0 +1,40 @@
+<!-- products/product-list/product-list.component.html -->
+<div class="product-list-container">
+  <div class="header">
+    <h2>Product List</h2>
+    <button mat-raised-button color="primary" (click)="addProduct()">
+      <mat-icon>add</mat-icon> Add Product
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading products...</div>
+
+  <div *ngIf="!isLoading && products.length === 0" class="no-products">
+    No products found.
+  </div>
+
+  <div class="product-grid">
+    <mat-card *ngFor="let product of products" class="product-card">
+      <mat-card-header>
+        <mat-card-title>{{ product.productname }}</mat-card-title>
+        <mat-card-subtitle>{{ product.category }}</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <p><strong>Price:</strong> ${{ product.price }}</p>
+      </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-button color="primary" (click)="viewProduct(product.id)">
+          <mat-icon>visibility</mat-icon> View
+        </button>
+        <button mat-button color="accent" (click)="editProduct(product.id)">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteProduct(product.id)">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
