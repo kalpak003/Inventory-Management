@@ -7,8 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { ReactiveFormsModule } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-seller-form',
@@ -16,34 +16,31 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./seller-form.component.css'],
   standalone: true,
   imports: [
-    CommonModule, // Required for *ngIf
+    CommonModule, 
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatCardModule,
-    MatButtonModule
+    MatButtonModule,
+    MatSnackBarModule // ✅ Added missing import
   ],
 })
 export class SellerFormComponent implements OnInit {
   sellerForm!: FormGroup;
-  isEditMode = false; // Change based on edit mode
+  isEditMode = false;
+  sellerId: number | null = null;
 
-  // Sample data (Replace with API data)
-  sellerData = {
-    company_name: 'ABC Traders',
-    concernedperson: 'John Doe',
-    address: '123 Street, City',
-    contact: '9876543210',
-    email: 'abc@example.com',
-    gstno: 'GST1234567'
-  };
-
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private sellerService: SellerService,
+    private route: ActivatedRoute,
+    public router: Router,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    // Initialize form
     this.sellerForm = this.fb.group({
-      company_name: ['', Validators.required],
+      companyname: ['', Validators.required],
       concernedperson: ['', Validators.required],
       address: ['', Validators.required],
       contact: ['', [Validators.required, Validators.pattern('[0-9]{10}')]],
@@ -51,22 +48,62 @@ export class SellerFormComponent implements OnInit {
       gstno: ['', Validators.required]
     });
 
-    // Populate form with data if in edit mode
-    if (this.isEditMode) {
-      this.sellerForm.patchValue(this.sellerData);
-    }
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.isEditMode = true;
+        this.sellerId = +id;
+        this.loadSellerData(this.sellerId);
+      }
+    });
+  }
+
+  // Load existing seller data when editing
+  loadSellerData(id: number) {
+    this.sellerService.getSellerById(id).subscribe({
+      next: (seller) => this.sellerForm.patchValue(seller),
+      error: (err) => console.error('Error loading seller:', err)
+    });
   }
 
   onSubmit() {
     if (this.sellerForm.valid) {
-      console.log('Form Data:', this.sellerForm.value);
-      // Call API to save data
+      const sellerData = this.sellerForm.value;
+  
+      if (this.isEditMode && this.sellerId) {
+        this.sellerService.updateSeller(this.sellerId, sellerData).subscribe({
+          next: () => {
+            this.showSuccess('Seller updated successfully!');
+            this.router.navigate(['/dashboard/seller']); // Navigate back to the seller list
+          },
+          error: (err) => {
+            console.error('Error updating seller:', err);
+          }
+        });
+      } else {
+        this.sellerService.createSeller(sellerData).subscribe({
+          next: () => {
+            this.showSuccess('Seller added successfully!');
+            this.router.navigate(['/dashboard/seller']); // Navigate back to the seller list
+          },
+          error: (err) => {
+            console.error('Error adding seller:', err);
+          }
+        });
+      }
     }
   }
+  
+  
 
-  navigateToSellerList() {
-    console.log('Navigating back to seller list...');
-    // Add navigation logic here
+  // Cancel button functionality
+  onCancel() {
+    this.router.navigate(['/sellers']); // Navigate to seller list page
   }
-}
 
+  showSuccess(message: string) {
+    this.snackBar.open(message, 'Close', { duration: 3000 });
+    this.router.navigate(['/sellers']); 
+  }
+  
+}

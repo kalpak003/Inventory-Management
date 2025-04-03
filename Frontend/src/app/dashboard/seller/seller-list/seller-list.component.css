@@ -59,3 +59,34 @@ mat-card-content p {
   font-size: 14px;
   color: black;
 }
+
+.seller-container .header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.seller-container .spacer {
+  flex-grow: 1;
+}
+
+.seller-container .add-button {
+  margin-left: 10px;
+}
+
+.seller-container .seller-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.seller-container .seller-card {
+  width: 300px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.seller-container .seller-card:hover {
+  transform: scale(1.05);
+}

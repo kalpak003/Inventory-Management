@@ -49,21 +49,16 @@ export class SellerService {
       .pipe(catchError(this.handleError));
   }
 
-  // ✅ Create a new seller
-  createSeller(sellerData: Omit<Seller, 'id'>): Observable<Seller> {
-    return this.http.post<Seller>(this.apiUrl, sellerData, this.getHeaders())
-      .pipe(catchError(this.handleError));
+  createSeller(sellerData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, sellerData);
   }
 
-  // ✅ Update seller details
-  updateSeller(id: number, sellerData: Partial<Seller>): Observable<Seller> {
-    return this.http.put<Seller>(`${this.apiUrl}/${id}`, sellerData, this.getHeaders())
-      .pipe(catchError(this.handleError));
+
+  updateSeller(id: number, sellerData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, sellerData);
   }
 
-  // ✅ Delete a seller
   deleteSeller(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`, this.getHeaders())
-      .pipe(catchError(this.handleError));
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

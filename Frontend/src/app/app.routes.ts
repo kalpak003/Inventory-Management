@@ -2,6 +2,8 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth.guard';
 import { SellerListComponent } from './dashboard/seller/seller-list/seller-list.component';
+import { SellerFormComponent } from './dashboard/seller/seller-form/seller-form.component';
+import { SellerDetailsComponent } from './dashboard/seller/seller-details/seller-details.component';
 
 
 export const routes: Routes = [
@@ -39,15 +41,16 @@ export const routes: Routes = [
       },
 
       {
-        path: 'seller',  // ✅ Ensure this matches navigation links
+        path: 'seller',  // ✅ Matches navigation links
         loadComponent: () => import('./dashboard/seller/seller.component').then(m => m.SellerComponent),
         children: [
-          { path: '', component: SellerListComponent },
-          { path: 'add', loadComponent: () => import('./dashboard/seller/seller-form/seller-form.component').then(m => m.SellerFormComponent) },
-          { path: ':id', loadComponent: () => import('./dashboard/seller/seller-details/seller-details.component').then(m => m.SellerDetailsComponent) }, // ✅ Fixed
-          { path: ':id/edit', loadComponent: () => import('./dashboard/seller/seller-form/seller-form.component').then(m => m.SellerFormComponent) }
+          { path: '', component: SellerListComponent }, // Seller List View
+          { path: 'add', component: SellerFormComponent }, // Add Seller Form
+          { path: ':id', component: SellerDetailsComponent }, // Seller Details View
+          { path: ':id/edit', component: SellerFormComponent }
         ]
       },
+      
       
 
       { path: 'products', loadComponent: () => import('./dashboard/products/products.component').then(m => m.ProductsComponent) }

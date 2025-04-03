@@ -1,18 +1,32 @@
-/* seller-form.component.css */
-form {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.form-row {
+.form-container {
   display: flex;
-  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full screen height */
 }
 
-.form-row mat-form-field {
-  flex: 1;
+.seller-form-card {
+  width: 400px;
+  padding: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  background-color: white;
 }
 
-.full-width {
+/* seller-form.component.css */
+.form-card {
   width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.form-actions button {
+  width: 48%;
 }
