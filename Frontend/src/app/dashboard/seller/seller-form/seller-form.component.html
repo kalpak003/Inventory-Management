@@ -1,0 +1,38 @@
+<form [formGroup]="sellerForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label>Company Name:</label>
+    <input type="text" formControlName="company_name">
+  </div>
+
+  <div>
+    <label>Concerned Person:</label>
+    <input type="text" formControlName="concernedperson">
+  </div>
+
+  <div>
+    <label>Address:</label>
+    <textarea formControlName="address"></textarea>
+  </div>
+
+  <div>
+    <label>Contact:</label>
+    <input type="text" formControlName="contact">
+  </div>
+
+  <div>
+    <label>Email:</label>
+    <input type="email" formControlName="email">
+  </div>
+
+  <div>
+    <label>GST Number:</label>
+    <input type="text" formControlName="gstno">
+  </div>
+
+  <div>
+    <button type="button" (click)="navigateToSellerList()">Cancel</button>
+    <button type="submit" [disabled]="!sellerForm.valid">
+      {{ isEditMode ? 'Update' : 'Save' }}
+    </button>
+  </div>
+</form>

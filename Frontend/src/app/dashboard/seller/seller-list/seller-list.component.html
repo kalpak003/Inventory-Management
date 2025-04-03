@@ -1,0 +1,31 @@
+<div class="seller-container">
+  <!-- Header Section -->
+  <div class="header">
+    <h2 class="header-title">Sellers</h2>
+    <div class="spacer"></div>
+    <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="addSeller()" class="add-button">
+      <mat-icon>add</mat-icon>
+      <span>Add Seller</span>
+    </button>
+  </div>
+
+  <!-- Loading Indicator -->
+  <mat-spinner *ngIf="isLoading"></mat-spinner>
+
+  <!-- Seller List -->
+  <div *ngIf="!isLoading" class="seller-list">
+    <mat-card *ngFor="let seller of sellers" class="seller-card"
+              (click)="viewDetails(seller.id)"
+              (keydown.enter)="viewDetails(seller.id)"
+              tabindex="0"
+              role="button">
+      <mat-card-header>
+        <mat-card-title>{{ seller.companyname }}</mat-card-title>  <!-- ✅ Corrected -->
+        <mat-card-subtitle>{{ seller.contact }}</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ seller.address }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

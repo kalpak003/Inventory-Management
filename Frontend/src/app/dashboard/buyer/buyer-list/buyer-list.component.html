@@ -1,20 +1,26 @@
-<!-- buyer-list.component.html -->
 <div class="buyer-container">
   <div class="header">
-    <h2>Buyers</h2>
+    <h2 class="header-title">Buyers</h2>
+    <div class="spacer"></div>
+
+    <!-- Add Buyer Button (Admin only) -->
     <button *ngIf="isAdmin" 
-    mat-raised-button 
+            mat-raised-button 
             color="primary" 
             (click)="addBuyer()"
             class="add-button">
-      <mat-icon>add</mat-icon> Add Buyer
+      <mat-icon>add</mat-icon>
+      <span>Add Buyer</span>
     </button>
   </div>
 
+  <!-- Loading Spinner -->
   <mat-spinner *ngIf="isLoading"></mat-spinner>
 
   <div class="buyer-list">
-    <mat-card *ngFor="let buyer of buyers" class="buyer-card" (click)="viewDetails(buyer.id)">
+    <mat-card *ngFor="let buyer of buyers" 
+              class="buyer-card"
+              (click)="viewDetails(buyer.id)"> 
       <mat-card-header>
         <mat-card-title>{{ buyer.company_name }}</mat-card-title>
         <mat-card-subtitle>{{ buyer.concernedperson }}</mat-card-subtitle>
@@ -22,6 +28,16 @@
       <mat-card-content>
         <p>{{ buyer.address }}</p>
       </mat-card-content>
+
+      <!-- Edit & Delete Buttons Inside Each Buyer Card -->
+      <mat-card-actions *ngIf="isAdmin">
+        <button mat-icon-button color="primary" (click)="editBuyer(buyer.id, $event)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="confirmDelete(buyer.id, $event)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>

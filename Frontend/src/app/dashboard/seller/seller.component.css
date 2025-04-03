@@ -1,0 +1,28 @@
+.seller-container {
+  max-width: 600px;
+  margin: auto;
+}
+
+.seller-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seller-card {
+  background: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.seller-card:hover {
+  background: #e0e0e0;
+}
+
+.seller-details {
+  margin-top: 5px;
+  padding-left: 10px;
+  border-left: 2px solid #333;
+}
