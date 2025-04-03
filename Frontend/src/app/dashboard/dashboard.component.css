@@ -42,3 +42,41 @@
     padding: 20px;
     overflow-y: auto;
   }
+
+  /* Add these styles to your existing dashboard.component.css */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.session-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timer-btn {
+  cursor: default;
+  color: #3f51b5;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.timer-btn:hover {
+  background-color: transparent;
+}
+
+.spacer {
+  flex: 1;
+}
