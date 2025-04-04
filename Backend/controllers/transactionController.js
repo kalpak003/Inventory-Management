@@ -2,127 +2,155 @@ const db = require('../config/db'); // Database connection
 
 const transactionController = {
     // Fetch all transactions
-    getTransactions: (req, res) => {
-        db.query('SELECT * FROM transactions', (err, results) => {
-            if (err) {
-                console.error('Error fetching transactions:', err);
-                return res.status(500).json({ message: 'Error fetching transactions' });
-            }
+    getTransactions: async (req, res) => {
+        try {
+            const [results] = await db.query('SELECT * FROM transactions');
             res.json(results);
-        });
+        } catch (err) {
+            console.error('Error fetching transactions:', err);
+            res.status(500).json({ message: 'Error fetching transactions' });
+        }
     },
 
-    // Add a new transaction (BUY or SELL)
-    addTransaction: (req, res) => {
-        const {
-            product_id, productname, category, producttype, modelno, price, transdate,
-            availableqty, instockdate, instockqty, dispatchdate, dispatchqty, netstock,
-            buyername, sellername, orderid, transaction_type
-        } = req.body;
-
-        if (!product_id || !productname || !category || !producttype || !modelno || !price || !orderid || !transaction_type) {
-            return res.status(400).json({ message: 'All required fields must be filled' });
-        }
-
-        // Convert values to proper data types
-        const parsedPrice = parseFloat(price);
-        const parsedAvailableQty = parseInt(availableqty, 10);
-        const parsedInStockQty = instockqty ? parseInt(instockqty, 10) : 0;
-        const parsedDispatchQty = dispatchqty ? parseInt(dispatchqty, 10) : 0;
-        let parsedNetStock = parseInt(netstock, 10);
-        const parsedSellTotalPrice = parsedDispatchQty * parsedPrice || 0;
-
-        if (isNaN(parsedPrice) || isNaN(parsedAvailableQty) || isNaN(parsedNetStock)) {
-            return res.status(400).json({ message: 'Invalid numeric values' });
-        }
-
-        // Fetch current stock of the product
-        db.query('SELECT quantity FROM products WHERE id = ?', [product_id], (err, results) => {
-            if (err) {
-                console.error('Error fetching product stock:', err);
-                return res.status(500).json({ message: 'Error fetching product stock' });
-            }
-            if (results.length === 0) {
-                return res.status(404).json({ message: 'Product not found' });
-            }
-
-            let currentStock = results[0].quantity;
-
-            if (transaction_type === 'BUY') {
-                parsedNetStock = currentStock + parsedInStockQty;
-
-                // Update product stock
-                db.query('UPDATE products SET quantity = ? WHERE id = ?', [parsedNetStock, product_id], (err) => {
-                    if (err) {
-                        console.error('Error updating stock:', err);
-                        return res.status(500).json({ message: 'Error updating stock' });
-                    }
-
-                    // Insert transaction record
-                    insertTransaction();
-                });
-
-            } else if (transaction_type === 'SELL') {
-                if (currentStock < parsedDispatchQty) {
-                    return res.status(400).json({ message: 'Not enough stock available' });
-                }
-
-                parsedNetStock = currentStock - parsedDispatchQty;
-
-                // Update product stock
-                db.query('UPDATE products SET quantity = ? WHERE id = ?', [parsedNetStock, product_id], (err) => {
-                    if (err) {
-                        console.error('Error updating stock:', err);
-                        return res.status(500).json({ message: 'Error updating stock' });
-                    }
-
-                    // Insert transaction record
-                    insertTransaction();
-                });
-
-            } else {
-                return res.status(400).json({ message: 'Invalid transaction type' });
-            }
-        });
-
-        function insertTransaction() {
-            const query = `INSERT INTO transactions 
-                           (productname, buyername, category, producttype, modelno, price, transdate, 
-                            availableqty, instockdate, instockqty, dispatchdate, dispatchqty, netstock, 
-                            sellername, orderid, selltotalprice, transaction_type) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
-            const values = [
-                productname, buyername, category, producttype, modelno, parsedPrice, transdate,
-                parsedAvailableQty, instockdate, parsedInStockQty, dispatchdate, parsedDispatchQty, parsedNetStock,
-                sellername, orderid, parsedSellTotalPrice, transaction_type
-            ];
-
-            db.query(query, values, (err, results) => {
-                if (err) {
-                    console.error('Error adding transaction:', err);
-                    return res.status(500).json({ message: 'Error adding transaction' });
-                }
-                res.status(201).json({ id: results.insertId, productname, transaction_type, netstock: parsedNetStock });
+    // Get transactions by username (works with both params and body)
+getTransactionsByUsername: async (req, res) => {
+    try {
+        // Try to get username from params first, then body
+        const username = req.params.username || req.body.username;
+        
+        if (!username) {
+            return res.status(400).json({ 
+                message: 'Username is required as a parameter or in the request body' 
             });
         }
-    },
 
-    // Delete a transaction
-    deleteTransaction: (req, res) => {
-        const { id } = req.params;
-
-        db.query('DELETE FROM transactions WHERE id = ?', [id], (err, results) => {
-            if (err) {
-                console.error('Error deleting transaction:', err);
-                return res.status(500).json({ message: 'Error deleting transaction' });
-            }
-            if (results.affectedRows === 0) {
-                return res.status(404).json({ message: 'Transaction not found' });
-            }
-            res.json({ message: 'Transaction deleted successfully' });
+        const query = `
+            SELECT * FROM transactions 
+            WHERE (buyername = ? OR sellername = ?)
+            AND (buyername IS NOT NULL OR sellername IS NOT NULL)
+            ORDER BY transdate DESC
+        `;
+        
+        const [results] = await db.query(query, [username, username]);
+        
+        if (results.length === 0) {
+            return res.status(404).json({ 
+                message: `No transactions found for user: ${username}`,
+                searchedUsername: username,
+                suggestions: [
+                    'Check if the username exists in either buyername or sellername columns',
+                    'Verify there are no trailing spaces in the username',
+                    'The user may not have any transactions yet'
+                ]
+            });
+        }
+        
+        res.json({
+            username: username,
+            count: results.length,
+            transactions: results
+        });
+        
+    } catch (err) {
+        console.error('Error fetching user transactions:', err);
+        res.status(500).json({ 
+            message: 'Error fetching user transactions',
+            error: err.message 
         });
     }
+},
+
+    // Add a new transaction (BUY or SELL)
+    addTransaction: async (req, res) => {
+        const { product_id, quantity, transaction_type, username } = req.body;
+    
+        if (!product_id || !quantity || !transaction_type || !username) {
+            return res.status(400).json({ message: 'product_id, quantity, transaction_type, and username are required' });
+        }
+    
+        const parsedQty = parseInt(quantity, 10);
+    
+        if (isNaN(parsedQty) || parsedQty <= 0) {
+            return res.status(400).json({ message: 'Quantity must be a positive number' });
+        }
+    
+        try {
+            // Fetch product info
+            const [[product]] = await db.query('SELECT * FROM products WHERE id = ?', [product_id]);
+    
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+    
+            const {
+                productname,
+                category,
+                producttype,
+                modelno,
+                price,
+                quantity: currentStock
+            } = product;
+    
+            let netstock = currentStock;
+            let buyername = null;
+            let sellername = null;
+            const transdate = new Date();
+            const orderid = `ORD-${Date.now()}`;
+            const instockdate = transaction_type === 'BUY' ? transdate : null;
+            const dispatchdate = transaction_type === 'SELL' ? transdate : null;
+            const selltotalprice = parseFloat(price) * parsedQty;
+    
+            // Calculate stock
+            if (transaction_type === 'BUY') {
+                netstock = currentStock + parsedQty;
+                buyername = username;
+            } else if (transaction_type === 'SELL') {
+                if (currentStock < parsedQty) {
+                    return res.status(400).json({ message: 'Not enough stock available' });
+                }
+                netstock = currentStock - parsedQty;
+                sellername = username;
+            } else {
+                return res.status(400).json({ message: 'Invalid transaction type. Use BUY or SELL' });
+            }
+    
+            // Update product stock
+            await db.query('UPDATE products SET quantity = ? WHERE id = ?', [netstock, product_id]);
+    
+            // Insert transaction
+            const query = `
+                INSERT INTO transactions (
+                    productname, buyername, category, producttype, modelno, price, transdate,
+                    instockdate, instockqty, dispatchdate, dispatchqty, netstock,
+                    sellername, orderid, selltotalprice, transaction_type
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+    
+            const values = [
+                productname, buyername, category, producttype, modelno, price, transdate,
+                instockdate, transaction_type === 'BUY' ? parsedQty : 0,
+                dispatchdate, transaction_type === 'SELL' ? parsedQty : 0,
+                netstock, sellername, orderid, selltotalprice, transaction_type
+            ];
+    
+            const [result] = await db.query(query, values);
+    
+            res.status(201).json({
+                message: 'Transaction completed',
+                transaction_id: result.insertId,
+                productname,
+                transaction_type,
+                netstock,
+                orderid
+            });
+    
+        } catch (err) {
+            console.error('Error during transaction:', err);
+            res.status(500).json({ message: 'Transaction failed', error: err.message });
+        }
+    }
+    
+
 };
 
 module.exports = transactionController;
