@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, MatCardModule, MatButtonModule]
 })
+
 export class TransactionListComponent implements OnInit {
   products: any[] = [];
   isLoading = true;

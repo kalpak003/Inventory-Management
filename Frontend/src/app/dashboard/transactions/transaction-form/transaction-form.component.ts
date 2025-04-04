@@ -6,7 +6,7 @@ import { AuthService } from '../../../services/auth.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../../../app/shared/confirm-dialog/confirm-dialog.component';
-import { DatePipe ,CommonModule} from '@angular/common';
+import { DatePipe, CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -15,11 +15,11 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { NgIf } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
-
 @Component({
   selector: 'app-transaction-form',
   templateUrl: './transaction-form.component.html',
   styleUrls: ['./transaction-form.component.css'],
+  standalone: true,
   imports: [
     MatButtonModule,
     MatFormFieldModule,
@@ -28,14 +28,14 @@ import { ReactiveFormsModule } from '@angular/forms';
     MatNativeDateModule,
     NgIf,
     CommonModule,
-    ReactiveFormsModule
-  ]
+    ReactiveFormsModule,
+  ],
+  providers: [DatePipe]
 })
 export class TransactionFormComponent implements OnInit {
   transactionForm: FormGroup;
   product: any;
   transactionType: 'BUY' | 'SELL' = 'BUY';
-  currentDate = new Date().toISOString().split('T')[0];
   username: string = '';
 
   constructor(
@@ -48,19 +48,32 @@ export class TransactionFormComponent implements OnInit {
     private datePipe: DatePipe
   ) {
     this.transactionForm = this.fb.group({
-      orderid: ['', [Validators.required]],
+      orderid: [{ value: '', disabled: true }, Validators.required],
       quantity: ['', [Validators.required, Validators.min(1)]],
-      date: [this.currentDate, [Validators.required]]
+      date: [{ value: '', disabled: true }, Validators.required]
     });
   }
 
   ngOnInit(): void {
     this.product = history.state.product;
-    this.username = this.authService.getCurrentUser()?.username || '';
-    
+    this.username = this.authService.getCurrentUser()?.username || 'Default User';
+
     if (!this.product) {
       this.router.navigate(['/dashboard/transaction']);
+      return;
     }
+
+    // Generate random Order ID like ORD-20250404-123456
+    const timestamp = Date.now().toString().slice(-6);
+    const today = new Date();
+    const formattedDate = this.datePipe.transform(today, 'yyyyMMdd');
+    const orderId = `ORD-${formattedDate}-${timestamp}`;
+
+    // Set initial values
+    this.transactionForm.patchValue({
+      orderid: orderId,
+      date: today
+    });
   }
 
   setTransactionType(type: 'BUY' | 'SELL'): void {
@@ -74,21 +87,21 @@ export class TransactionFormComponent implements OnInit {
       width: '350px',
       data: {
         title: 'Confirm Transaction',
-        message: `Are you sure you want to ${this.transactionType} this product?`,
+        message: `Are you sure you want to ${this.transactionType} ${this.transactionForm.get('quantity')?.value} units of ${this.product.productname}?`,
         confirmText: 'Confirm',
         cancelText: 'Cancel'
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+    dialogRef.afterClosed().subscribe(confirm => {
+      if (confirm) {
         this.processTransaction();
       }
     });
   }
 
   private processTransaction(): void {
-    const formValue = this.transactionForm.value;
+    const formValue = this.transactionForm.getRawValue();
     const transactionData = {
       product_id: this.product.id,
       productname: this.product.productname,
@@ -110,12 +123,8 @@ export class TransactionFormComponent implements OnInit {
     };
 
     this.transactionService.createTransaction(transactionData).subscribe({
-      next: () => {
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        console.error('Transaction failed', err);
-      }
+      next: () => this.router.navigate(['/dashboard']),
+      error: (err) => console.error('Transaction failed', err)
     });
   }
 

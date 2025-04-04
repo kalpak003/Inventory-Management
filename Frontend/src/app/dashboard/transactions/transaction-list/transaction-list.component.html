@@ -1,20 +1,13 @@
 <!-- transaction-list.component.html -->
-<div class="transaction-list-container">
-    <h2>Select Product for Transaction</h2>
-    
-    <div *ngIf="isLoading" class="loading">Loading products...</div>
-  
-    <div class="product-grid">
-      <mat-card *ngFor="let product of products" class="product-card" (click)="selectProduct(product)">
-        <mat-card-header>
-          <mat-card-title>{{ product.productname }}</mat-card-title>
-          <mat-card-subtitle>{{ product.category }}</mat-card-subtitle>
-        </mat-card-header>
-        
-        <mat-card-content>
-          <p>Price: ${{ product.price }}</p>
-          <p>Available: {{ product.quantity }}</p>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  </div>
+<div class="product-grid">
+  <mat-card *ngFor="let product of products" class="product-card" (click)="selectProduct(product)">
+    <mat-card-header>
+      <mat-card-title>{{ product.productname }}</mat-card-title>
+      <mat-card-subtitle>{{ product.category }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Price: ${{ product.price }}</p>
+      <p>Available: {{ product.quantity }}</p>
+    </mat-card-content>
+  </mat-card>
+</div>
