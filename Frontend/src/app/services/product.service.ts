@@ -1,33 +1,60 @@
-// services/product.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
-@Injectable({
-  providedIn: 'root'
-})
+export interface Product {
+  id: number;
+  productname: string;
+  category: string;
+  producttype: string;
+  modelno: string;
+  description: string;
+  image: string | null;
+  unit: string;
+  price: string;
+  status: string;
+  quantity: number;
+}
+
+@Injectable({ providedIn: 'root' })
 export class ProductService {
   private apiUrl = 'http://localhost:3000/api/products';
 
   constructor(private http: HttpClient) {}
 
-  getProducts(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);
+  private getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      })
+    };
   }
 
-  getProduct(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
+  private handleError(error: HttpErrorResponse) {
+    console.error(`Error ${error.status}:`, error.error);
+    return throwError(() => new Error(error.error?.message || 'Something went wrong'));
   }
 
-  createProduct(productData: any): Observable<any> {
-    return this.http.post(this.apiUrl, productData);
+  getProducts(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.apiUrl, this.getHeaders()).pipe(catchError(this.handleError));
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this.http.get<Product>(`${this.apiUrl}/${id}`, this.getHeaders()).pipe(catchError(this.handleError));
+  }
+
+  addProduct(productData: any): Observable<any> {
+    return this.http.post<any>(this.apiUrl, productData, this.getHeaders());
   }
 
   updateProduct(id: number, productData: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/${id}`, productData);
+    return this.http.put(`${this.apiUrl}/${id}`, productData, this.getHeaders());
   }
 
-  deleteProduct(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  deleteProduct(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, this.getHeaders());
   }
 }

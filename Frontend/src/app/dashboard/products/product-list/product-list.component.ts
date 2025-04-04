@@ -1,30 +1,45 @@
-// products/product-list/product-list.component.ts
 import { Component, OnInit } from '@angular/core';
-import { ProductService } from '../../../services/product.service';
 import { Router } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
+import { ProductService } from '../../../services/product.service';
+import { AuthService } from '../../../services/auth.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
+import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-product-list',
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css'],
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule]
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    RouterModule
+  ],
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];
   isLoading = true;
+  isAdmin = false;
 
   constructor(
     private productService: ProductService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
     this.loadProducts();
+    this.isAdmin = this.authService.getCurrentUser()?.role === 'admin';
   }
 
   loadProducts(): void {
@@ -34,34 +49,36 @@ export class ProductListComponent implements OnInit {
         this.isLoading = false;
       },
       error: (err) => {
-        console.error('Error loading products', err);
+        console.error('Error loading products:', err);
         this.isLoading = false;
       }
     });
   }
 
-  viewProduct(id: number): void {
-    this.router.navigate(['/products', id]);
+// 👇 To view product details (read-only)
+viewDetails(productId: number) {
+  this.router.navigate(['/dashboard/products', productId], { queryParams: { view: true } });
+}
+  
+
+  addProduct(): void {
+    this.router.navigate(['/dashboard/products/add']);
   }
 
-  editProduct(id: number): void {
-    this.router.navigate(['/products', id, 'edit']);
+  editProduct(product: any): void {
+    this.router.navigate([`/dashboard/products/${product.id}/edit`]);
   }
 
   deleteProduct(id: number): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.productService.deleteProduct(id).subscribe({
-        next: () => {
-          this.loadProducts();
-        },
-        error: (err) => {
-          console.error('Error deleting product', err);
-        }
-      });
-    }
-  }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: { message: 'Are you sure you want to delete this product?' }
+    });
 
-  addProduct(): void {
-    this.router.navigate(['/products/new']);
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+      }
+    });
   }
 }

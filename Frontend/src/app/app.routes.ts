@@ -39,7 +39,8 @@ export const routes: Routes = [
           { path: '', loadComponent: () => import('./dashboard/buyer/buyer-list/buyer-list.component').then(m => m.BuyerListComponent) },
           { path: 'add', loadComponent: () => import('./dashboard/buyer/buyer-form/buyer-form.component').then(m => m.BuyerFormComponent) },
           { path: ':id', loadComponent: () => import('./dashboard/buyer/buyer-details/buyer-details.component').then(m => m.BuyerDetailsComponent) }, 
-          { path: ':id/edit', loadComponent: () => import('./dashboard/buyer/buyer-form/buyer-form.component').then(m => m.BuyerFormComponent) }
+          { path: ':id/edit', loadComponent: () => import('./dashboard/buyer/buyer-form/buyer-form.component').then(m => m.BuyerFormComponent) },
+          
         ]
       },
 
@@ -57,8 +58,8 @@ export const routes: Routes = [
       
 
       {
-        path: 'products',  // Matches navigation links
-        loadComponent: () => import('./dashboard/products/product-list/product-list.component').then(m => m.ProductListComponent),
+        path: 'products',
+        loadComponent: () => import('./dashboard/products/products.component').then(m => m.ProductComponent),
         children: [
           { path: '', component: ProductListComponent }, // Product List View
           { path: 'new', component: ProductFormComponent }, // Add New Product Form

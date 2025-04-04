@@ -1,31 +1,43 @@
-<!-- products/product-detail/product-detail.component.html -->
-<div class="product-detail-container">
-    <div *ngIf="isLoading">Loading product details...</div>
-    
-    <mat-card *ngIf="!isLoading && product" class="product-detail-card">
-      <mat-card-header>
-        <mat-card-title>{{ product.productname }}</mat-card-title>
-        <mat-card-subtitle>{{ product.category }} - {{ product.producttype }}</mat-card-subtitle>
-      </mat-card-header>
-      
-      <mat-card-content>
-        <div class="product-details">
-          <p><strong>Description:</strong> {{ product.description }}</p>
-          <p><strong>Model No:</strong> {{ product.modelno }}</p>
-          <p><strong>Unit:</strong> {{ product.unit }}</p>
-          <p><strong>Price:</strong> ${{ product.price }}</p>
-          <p><strong>Status:</strong> {{ product.status }}</p>
-          <p><strong>Quantity:</strong> {{ product.quantity }}</p>
-        </div>
-      </mat-card-content>
-      
-      <mat-card-actions>
-        <button mat-raised-button color="primary" (click)="editProduct()">
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button mat-raised-button (click)="goBack()">
-          <mat-icon>arrow_back</mat-icon> Back to List
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner></mat-spinner>
+</div>
+
+<ng-container *ngIf="!isLoading && product">
+  <mat-card class="product-card">
+
+    <!-- Optional Image Display -->
+    <img *ngIf="product.image" [src]="product.image" alt="Product Image" class="product-image" />
+
+    <!-- Optional Edit Button -->
+    <mat-card-header>
+      <button mat-icon-button color="primary" class="edit-button" *ngIf="false">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </mat-card-header>
+
+    <mat-card-content>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Product Name</mat-label>
+        <input matInput [(ngModel)]="product.productname" disabled>
+      </mat-form-field>
+
+
+      <mat-form-field appearance="outline">
+        <mat-label>Unit</mat-label>
+        <input matInput [(ngModel)]="product.unit" disabled>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Price</mat-label>
+        <input matInput type="number" [(ngModel)]="product.price" disabled>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Description</mat-label>
+        <textarea matInput [(ngModel)]="product.description" disabled></textarea>
+      </mat-form-field>
+
+    </mat-card-content>
+  </mat-card>
+</ng-container>
