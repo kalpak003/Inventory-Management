@@ -1,24 +1,37 @@
-<!-- dashboard.component.html -->
 <div class="dashboard-container">
-    <!-- Sidebar -->
-    <app-sidebar></app-sidebar>
-  
-    <!-- Main Content Area -->
-    <div class="main-area">
-      <!-- Top Navigation Bar -->
-      <div class="top-bar">
-        <div class="spacer"></div>
-        <div class="user-controls">
-          <button mat-button class="dashboard-btn" routerLink="/dashboard">
-            <mat-icon>dashboard</mat-icon> Dashboard
+
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-area">
+    <!-- Top Navigation Bar -->
+    <div class="top-bar">
+      <div class="spacer"></div>
+      <div class="user-controls">
+        <div class="session-controls">
+          <button mat-button class="timer-btn" [matTooltip]="'Session expires in ' + formattedTime">
+            <mat-icon>access_time</mat-icon>
+            {{ formattedTime }}
           </button>
-          <app-user-profile [initials]="userInitials"></app-user-profile>
+          <div class="transaction-button-container">
+            <button mat-raised-button color="primary" class="transaction-button" 
+                    (click)="navigateToTransaction()">
+              <mat-icon>swap_horiz</mat-icon> Buy/Sell
+            </button>
+          </div>
+          <button mat-button color="warn" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            Logout
+          </button>
         </div>
-      </div>
-  
-      <!-- Dynamic Content -->
-      <div class="content-wrapper">
-        <router-outlet></router-outlet>
+        <app-user-profile [initials]="userInitials"></app-user-profile>
       </div>
     </div>
+
+    <!-- Dynamic Content -->
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
   </div>
+</div>

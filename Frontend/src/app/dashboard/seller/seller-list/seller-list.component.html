@@ -1,31 +1,45 @@
 <div class="seller-container">
-  <!-- Header Section -->
   <div class="header">
     <h2 class="header-title">Sellers</h2>
     <div class="spacer"></div>
-    <button *ngIf="isAdmin" mat-raised-button color="primary" (click)="addSeller()" class="add-button">
+
+    <!-- Add Seller Button (Admin only) -->
+    <button *ngIf="isAdmin" 
+            mat-raised-button 
+            color="primary" 
+            (click)="addSeller()"
+            class="add-button">
       <mat-icon>add</mat-icon>
       <span>Add Seller</span>
     </button>
   </div>
 
-  <!-- Loading Indicator -->
+  <!-- Loading Spinner -->
   <mat-spinner *ngIf="isLoading"></mat-spinner>
 
-  <!-- Seller List -->
   <div *ngIf="!isLoading" class="seller-list">
-    <mat-card *ngFor="let seller of sellers" class="seller-card"
-              (click)="viewDetails(seller.id)"
-              (keydown.enter)="viewDetails(seller.id)"
+    <mat-card *ngFor="let seller of sellers" 
+              class="seller-card"
+              (click)="viewDetails(seller.id)" 
               tabindex="0"
               role="button">
       <mat-card-header>
-        <mat-card-title>{{ seller.companyname }}</mat-card-title>  <!-- ✅ Corrected -->
+        <mat-card-title>{{ seller.companyname }}</mat-card-title>
         <mat-card-subtitle>{{ seller.contact }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
         <p>{{ seller.address }}</p>
       </mat-card-content>
+
+      <!-- Edit & Delete Buttons Inside Each Seller Card -->
+      <mat-card-actions *ngIf="isAdmin">
+        <button mat-icon-button color="primary" (click)="editSeller(seller)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteSeller(seller.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>

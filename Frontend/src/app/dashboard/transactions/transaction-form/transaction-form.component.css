@@ -1,0 +1,30 @@
+/* transaction-form.component.css */
+.transaction-form {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .full-width {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .transaction-type {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  
+  .transaction-type button {
+    flex: 1;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }

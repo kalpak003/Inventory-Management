@@ -1,7 +1,8 @@
-.seller-container {
+.product-container {
   padding: 20px;
 }
 
+/* Header section with Add button */
 .header {
   display: flex;
   align-items: center;
@@ -20,16 +21,21 @@
 
 .add-button {
   margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.seller-list {
+/* Grid/list of products */
+.product-list {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
   margin-top: 20px;
 }
 
-.seller-card {
+/* Individual product card */
+.product-card {
   width: 300px;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -39,11 +45,12 @@
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.seller-card:hover {
+.product-card:hover {
   transform: scale(1.05);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Typography for mat-card sections */
 mat-card-title {
   font-size: 18px;
   font-weight: bold;
@@ -58,35 +65,19 @@ mat-card-subtitle {
 mat-card-content p {
   font-size: 14px;
   color: black;
+  margin: 4px 0;
 }
 
-.seller-container .header {
+/* Card actions (edit/delete buttons) */
+mat-card-actions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.seller-container .spacer {
-  flex-grow: 1;
-}
-
-.seller-container .add-button {
-  margin-left: 10px;
-}
-
-.seller-container .seller-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.seller-container .seller-card {
-  width: 300px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.seller-container .seller-card:hover {
-  transform: scale(1.05);
+/* Spinner center alignment */
+mat-spinner {
+  display: block;
+  margin: 40px auto;
 }

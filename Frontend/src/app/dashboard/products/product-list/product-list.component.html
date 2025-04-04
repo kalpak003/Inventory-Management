@@ -1,0 +1,47 @@
+<div class="product-container">
+  <div class="header">
+    <h2 class="header-title">Products</h2>
+    <div class="spacer"></div>
+
+    <!-- Add Product Button (Admin only) -->
+    <button *ngIf="isAdmin" 
+            mat-raised-button 
+            color="primary" 
+            (click)="addProduct()"
+            class="add-button">
+      <mat-icon>add</mat-icon>
+      <span>Add Product</span>
+    </button>
+  </div>
+
+
+
+  <!-- Product Cards -->
+  <div *ngIf="!isLoading" class="product-list">
+    <mat-card *ngFor="let product of products" 
+              class="product-card"
+              (click)="viewDetails(product.id)" 
+              tabindex="0"
+              role="button">
+      <mat-card-header>
+        <mat-card-title>{{ product.productname }}</mat-card-title>
+        <mat-card-subtitle>Price: ₹{{ product.price }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p><strong>Unit:</strong> {{ product.unit }}</p>
+        <p><strong>Description:</strong> {{ product.description }}</p>
+      </mat-card-content>
+
+      <!-- Edit & Delete Buttons (Admin only) -->
+      <mat-card-actions *ngIf="isAdmin">
+        <button mat-icon-button color="primary" (click)="editProduct(product)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteProduct(product.id)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

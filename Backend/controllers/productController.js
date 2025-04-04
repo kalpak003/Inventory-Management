@@ -107,6 +107,28 @@ const ProductController = {
             console.error("Error deleting product:", err.sqlMessage);
             res.status(500).json({ message: "Error deleting product" });
         }
+    }],
+
+    getProductById: [verifyToken, async (req, res) => {
+        const { id } = req.params;
+
+        if (isNaN(id)) {
+            return res.status(400).json({ message: "Invalid product ID format" });
+        }
+
+        try {
+            // Fetch product details by ID
+            const [results] = await db.query("SELECT * FROM products WHERE id = ?", [id]);
+
+            if (results.length === 0) {
+                return res.status(404).json({ message: "Product not found" });
+            }
+
+            res.json(results[0]);
+        } catch (err) {
+            console.error("Error fetching product by ID:", err.sqlMessage);
+            res.status(500).json({ message: "Error fetching product details" });
+        }
     }]
 };
 
