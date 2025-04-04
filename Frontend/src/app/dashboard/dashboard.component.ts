@@ -72,4 +72,9 @@ export class DashboardComponent implements OnInit {
   ngOnDestroy(): void {
     clearInterval(this.timerInterval);
   }
+
+  // dashboard.component.ts
+navigateToTransaction(): void {
+  this.router.navigate(['/dashboard/transactions']);  // Note the full path
+}
 }

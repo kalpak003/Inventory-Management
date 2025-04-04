@@ -7,7 +7,8 @@ import { SellerDetailsComponent } from './dashboard/seller/seller-details/seller
 import { ProductListComponent } from './dashboard/products/product-list/product-list.component';
 import { ProductDetailComponent } from './dashboard/products/product-detail/product-detail.component';
 import { ProductFormComponent } from './../app/dashboard/products/product-form/product-form.component';
-
+import {TransactionListComponent} from '../app/dashboard/transactions/transaction-list/transaction-list.component';
+import { TransactionFormComponent } from '../app/dashboard/transactions/transaction-form/transaction-form.component';
 
 export const routes: Routes = [
   { 
@@ -66,7 +67,17 @@ export const routes: Routes = [
           { path: ':id', component: ProductDetailComponent }, // Product Details View
           { path: ':id/edit', component: ProductFormComponent } // Edit Product Form
         ]
+      },
+
+      
+      {
+        path: 'transactions',  
+        children: [
+          { path: '', component: TransactionListComponent },
+          { path: 'form', component: TransactionFormComponent }
+        ]
       }
+      
     ]
   }
 ];

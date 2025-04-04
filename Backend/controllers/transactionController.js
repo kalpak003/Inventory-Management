@@ -60,96 +60,78 @@ getTransactionsByUsername: async (req, res) => {
     }
 },
 
-    // Add a new transaction (BUY or SELL)
-    addTransaction: async (req, res) => {
-        const { product_id, quantity, transaction_type, username } = req.body;
-    
-        if (!product_id || !quantity || !transaction_type || !username) {
-            return res.status(400).json({ message: 'product_id, quantity, transaction_type, and username are required' });
-        }
-    
-        const parsedQty = parseInt(quantity, 10);
-    
-        if (isNaN(parsedQty) || parsedQty <= 0) {
-            return res.status(400).json({ message: 'Quantity must be a positive number' });
-        }
-    
-        try {
-            // Fetch product info
-            const [[product]] = await db.query('SELECT * FROM products WHERE id = ?', [product_id]);
-    
-            if (!product) {
-                return res.status(404).json({ message: 'Product not found' });
-            }
-    
-            const {
-                productname,
-                category,
-                producttype,
-                modelno,
-                price,
-                quantity: currentStock
-            } = product;
-    
-            let netstock = currentStock;
-            let buyername = null;
-            let sellername = null;
-            const transdate = new Date();
-            const orderid = `ORD-${Date.now()}`;
-            const instockdate = transaction_type === 'BUY' ? transdate : null;
-            const dispatchdate = transaction_type === 'SELL' ? transdate : null;
-            const selltotalprice = parseFloat(price) * parsedQty;
-    
-            // Calculate stock
-            if (transaction_type === 'BUY') {
-                netstock = currentStock + parsedQty;
-                buyername = username;
-            } else if (transaction_type === 'SELL') {
-                if (currentStock < parsedQty) {
-                    return res.status(400).json({ message: 'Not enough stock available' });
-                }
-                netstock = currentStock - parsedQty;
-                sellername = username;
-            } else {
-                return res.status(400).json({ message: 'Invalid transaction type. Use BUY or SELL' });
-            }
-    
-            // Update product stock
-            await db.query('UPDATE products SET quantity = ? WHERE id = ?', [netstock, product_id]);
-    
-            // Insert transaction
-            const query = `
-                INSERT INTO transactions (
-                    productname, buyername, category, producttype, modelno, price, transdate,
-                    instockdate, instockqty, dispatchdate, dispatchqty, netstock,
-                    sellername, orderid, selltotalprice, transaction_type
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            `;
-    
-            const values = [
-                productname, buyername, category, producttype, modelno, price, transdate,
-                instockdate, transaction_type === 'BUY' ? parsedQty : 0,
-                dispatchdate, transaction_type === 'SELL' ? parsedQty : 0,
-                netstock, sellername, orderid, selltotalprice, transaction_type
-            ];
-    
-            const [result] = await db.query(query, values);
-    
-            res.status(201).json({
-                message: 'Transaction completed',
-                transaction_id: result.insertId,
-                productname,
-                transaction_type,
-                netstock,
-                orderid
-            });
-    
-        } catch (err) {
-            console.error('Error during transaction:', err);
-            res.status(500).json({ message: 'Transaction failed', error: err.message });
-        }
+addTransaction: async (req, res) => {
+    const {
+        product_id, productname, category, producttype, modelno, price, transdate,
+        instockdate, instockqty, dispatchdate, dispatchqty,
+        orderid, transaction_type, username
+    } = req.body;
+
+    if (!product_id || !productname || !category || !producttype || !modelno || !price || !orderid || !transaction_type || !username) {
+        return res.status(400).json({ message: 'All required fields must be filled' });
     }
-    
+
+    const parsedPrice = parseFloat(price);
+    const parsedInStockQty = instockqty ? parseInt(instockqty, 10) : 0;
+    const parsedDispatchQty = dispatchqty ? parseInt(dispatchqty, 10) : 0;
+
+    try {
+        const [[product]] = await db.query('SELECT quantity FROM products WHERE id = ?', [product_id]);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        let currentStock = product.quantity;
+        let netstock = currentStock;
+        let buyername = null;
+        let sellername = null;
+
+        if (transaction_type === 'BUY') {
+            netstock = currentStock + parsedInStockQty;
+            buyername = username;
+        } else if (transaction_type === 'SELL') {
+            if (currentStock < parsedDispatchQty) {
+                return res.status(400).json({ message: 'Not enough stock available for sale' });
+            }
+            netstock = currentStock - parsedDispatchQty;
+            sellername = username;
+        } else {
+            return res.status(400).json({ message: 'Invalid transaction type' });
+        }
+
+        // Update product stock
+        await db.query('UPDATE products SET quantity = ? WHERE id = ?', [netstock, product_id]);
+
+        // Insert transaction
+        const query = `INSERT INTO transactions 
+                       (productname, buyername, category, producttype, modelno, price, transdate, 
+                        instockdate, instockqty, dispatchdate, dispatchqty, netstock, 
+                        sellername, orderid, selltotalprice, transaction_type) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+        const values = [
+            productname, buyername, category, producttype, modelno, parsedPrice, transdate,
+            instockdate, parsedInStockQty, dispatchdate, parsedDispatchQty, netstock,
+            sellername, orderid, parsedDispatchQty * parsedPrice, transaction_type
+        ];
+
+        const [result] = await db.query(query, values);
+
+        res.status(201).json({
+            message: 'Transaction recorded successfully',
+            id: result.insertId,
+            productname,
+            transaction_type,
+            netstock
+        });
+
+    } catch (err) {
+        console.error('Error handling transaction:', err);
+        res.status(500).json({ message: 'Transaction failed', error: err.message });
+    }
+},
+
 
 };
 

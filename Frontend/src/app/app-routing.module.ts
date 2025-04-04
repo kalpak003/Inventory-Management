@@ -7,7 +7,6 @@ import { BuyerListComponent } from './../app/dashboard/buyer/buyer-list/buyer-li
 import { BuyerFormComponent } from './../app/dashboard/buyer/buyer-form/buyer-form.component';
 import { SellerListComponent } from './../app/dashboard/seller/seller-list/seller-list.component';
 import { SellerDetailsComponent } from './../app/dashboard/seller/seller-details/seller-details.component';
-
 const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
@@ -25,7 +24,8 @@ const routes: Routes = [
   { path: 'dashboard/seller/:id', component: SellerDetailsComponent }, // 👈 Fix missing route
 
   // Default redirect
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+
 ];
 
 @NgModule({

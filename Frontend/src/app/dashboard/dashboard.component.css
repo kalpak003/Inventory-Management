@@ -80,3 +80,15 @@
 .spacer {
   flex: 1;
 }
+
+/* dashboard.component.css */
+.buy-sell-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.buy-sell-container button {
+  padding: 10px 30px;
+  font-size: 1.1rem;
+}
