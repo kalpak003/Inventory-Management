@@ -10,6 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule } from '@angular/router';
+import { MatSnackBar } from '@angular/material/snack-bar';
+
 
 @Component({
   selector: 'app-product-list',
@@ -34,7 +36,8 @@ export class ProductListComponent implements OnInit {
     private productService: ProductService,
     private router: Router,
     private authService: AuthService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar 
   ) {}
 
   ngOnInit(): void {
@@ -43,6 +46,7 @@ export class ProductListComponent implements OnInit {
   }
 
   loadProducts(): void {
+    this.isLoading = true;
     this.productService.getProducts().subscribe({
       next: (data) => {
         this.products = data;
@@ -51,11 +55,14 @@ export class ProductListComponent implements OnInit {
       error: (err) => {
         console.error('Error loading products:', err);
         this.isLoading = false;
+        this.snackBar.open('Error loading products', 'Close', {
+          duration: 2000
+        });
       }
     });
   }
 
-// 👇 To view product details (read-only)
+
 viewDetails(productId: number) {
   this.router.navigate(['/dashboard/products', productId], { queryParams: { view: true } });
 }
@@ -72,12 +79,29 @@ viewDetails(productId: number) {
   deleteProduct(id: number): void {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       width: '350px',
-      data: { message: 'Are you sure you want to delete this product?' }
+      data: { 
+        title: 'Confirm Delete',
+        message: 'Are you sure you want to delete this product?'
+      }
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+        this.isLoading = true;
+        this.productService.deleteProduct(id).subscribe({
+          next: () => {
+            this.snackBar.open('Product deleted successfully!', 'Close', {
+              duration: 3000
+            });
+            this.loadProducts();
+          },
+          error: (err) => {
+            this.snackBar.open('Failed to delete product', 'Close', {
+              duration: 3000
+            });
+            this.isLoading = false;
+          }
+        });
       }
     });
   }

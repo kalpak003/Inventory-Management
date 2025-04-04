@@ -62,7 +62,7 @@ export const routes: Routes = [
         loadComponent: () => import('./dashboard/products/products.component').then(m => m.ProductComponent),
         children: [
           { path: '', component: ProductListComponent }, // Product List View
-          { path: 'new', component: ProductFormComponent }, // Add New Product Form
+          { path: 'add', component: ProductFormComponent }, // Add New Product Form
           { path: ':id', component: ProductDetailComponent }, // Product Details View
           { path: ':id/edit', component: ProductFormComponent } // Edit Product Form
         ]
