@@ -1,7 +1,8 @@
-.product-list-container {
+.product-container {
   padding: 20px;
 }
 
+/* Header section with Add button */
 .header {
   display: flex;
   align-items: center;
@@ -14,15 +15,26 @@
   font-weight: bold;
 }
 
-.product-grid {
-  display: flex;
-  flex-wrap: nowrap; /* Ensures cards stay in a single horizontal line */
-  gap: 15px;
-  margin-top: 20px;
-  overflow-x: auto; /* Horizontal scrolling if necessary */
-  padding-bottom: 10px;
+.spacer {
+  flex-grow: 1;
 }
 
+.add-button {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Grid/list of products */
+.product-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* Individual product card */
 .product-card {
   width: 300px;
   cursor: pointer;
@@ -38,6 +50,7 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
+/* Typography for mat-card sections */
 mat-card-title {
   font-size: 18px;
   font-weight: bold;
@@ -52,4 +65,19 @@ mat-card-subtitle {
 mat-card-content p {
   font-size: 14px;
   color: black;
+  margin: 4px 0;
+}
+
+/* Card actions (edit/delete buttons) */
+mat-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* Spinner center alignment */
+mat-spinner {
+  display: block;
+  margin: 40px auto;
 }
