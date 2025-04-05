@@ -24,6 +24,7 @@ export class SidebarComponent {
   menuItems = [
     { name: 'Buyer', icon: 'person', route: '/dashboard/buyer' },
     { name: 'Seller', icon: 'store', route: '/dashboard/seller' },
-    { name: 'Products', icon: 'shopping_bag', route: '/dashboard/products' }
+    { name: 'Products', icon: 'shopping_bag', route: '/dashboard/products' },
+    { name: 'Transactions', icon: 'receipt_long', route: '/dashboard/transaction-segment' }
   ];
 }

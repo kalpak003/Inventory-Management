@@ -76,6 +76,14 @@ export const routes: Routes = [
           { path: '', component: TransactionListComponent },
           { path: 'form', component: TransactionFormComponent }
         ]
+      },
+
+      {
+        path: 'transaction-segment',
+        loadComponent: () =>
+          import('../app/dashboard/transaction-segment/transaction-segment.component').then(
+            (m) => m.TransactionSegmentComponent
+          ),
       }
       
     ]

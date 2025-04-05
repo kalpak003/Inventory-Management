@@ -69,4 +69,11 @@ export class AuthService {
     return { role: payload.role }; // Assuming role is stored in JWT payload
   }
   
+  getUserName(): string {
+    const token = localStorage.getItem('token');
+    if (!token) return '';
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.username || '';
+  }
+  
 }

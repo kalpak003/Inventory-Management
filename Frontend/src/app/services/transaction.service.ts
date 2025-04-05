@@ -14,4 +14,9 @@ export class TransactionService {
   createTransaction(transactionData: any): Observable<any> {
     return this.http.post(this.apiUrl, transactionData);
   }
+
+  getUserTransactions(username: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/user/search`, { username });
+  }
+  
 }
