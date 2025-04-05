@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { UserProfileComponent } from './user-profile/user-profile.component';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterModule, RouterOutlet } from '@angular/router'; // Added Router import
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TransactionService } from '../services/transaction.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,12 +16,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
   imports: [
     SidebarComponent,
     MatIconModule,
-    UserProfileComponent,
     RouterModule,
     RouterOutlet,
     CommonModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
   standalone: true
 })
@@ -30,10 +31,13 @@ export class DashboardComponent implements OnInit {
   timeLeft: number = 3600;
   formattedTime: string = '01:00:00';
   private timerInterval: any;
+ 
+  
 
   constructor(
     private authService: AuthService,
-    private router: Router // Inject Router
+    private router: Router,
+    private transactionService: TransactionService,
   ) {}
 
   ngOnInit(): void {
@@ -66,7 +70,7 @@ export class DashboardComponent implements OnInit {
   logout(): void {
     clearInterval(this.timerInterval);
     this.authService.logout();
-    this.router.navigate(['/login']); // Add this line to navigate to login page
+    this.router.navigate(['/login']);
   }
 
   ngOnDestroy(): void {
@@ -75,6 +79,8 @@ export class DashboardComponent implements OnInit {
 
   // dashboard.component.ts
 navigateToTransaction(): void {
-  this.router.navigate(['/dashboard/transactions']);  // Note the full path
+  this.router.navigate(['/dashboard/transactions']);
 }
+
+
 }

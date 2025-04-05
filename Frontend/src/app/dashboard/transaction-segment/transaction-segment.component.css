@@ -1,0 +1,25 @@
+.transactions-container {
+    padding: 20px;
+  }
+  
+  .title {
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  
+  .card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  
+  .txn-card {
+    width: 320px;
+    cursor: default;
+    pointer-events: none; /* disable interaction */
+  }
+  
+  .txn-card * {
+    pointer-events: none; /* prevent any internal element from being interactive */
+  }
+  

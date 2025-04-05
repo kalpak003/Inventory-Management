@@ -1,0 +1,32 @@
+<div class="transactions-container">
+    <h2 class="title">Your Transactions ({{ transactions.length }})</h2>
+  
+    <div class="card-grid">
+      <mat-card *ngFor="let txn of transactions" class="txn-card no-click" appearance="outlined">
+        <mat-card-header>
+          <mat-icon [color]="txn.transaction_type === 'BUY' ? 'primary' : 'warn'">
+            {{ txn.transaction_type === 'BUY' ? 'arrow_downward' : 'arrow_upward' }}
+          </mat-icon>
+          <mat-card-title>{{ txn.productname }}</mat-card-title>
+          <mat-card-subtitle>Order ID: {{ txn.orderid }}</mat-card-subtitle>
+        </mat-card-header>
+  
+        <mat-card-content>
+          <p><strong>Transaction Type:</strong> {{ txn.transaction_type }}</p>
+          <p><strong>Model No:</strong> {{ txn.modelno }}</p>
+          <p><strong>Category:</strong> {{ txn.category }}</p>
+          <p><strong>Product Type:</strong> {{ txn.producttype }}</p>
+          <p><strong>Price:</strong> ₹{{ txn.price }}</p>
+          <p><strong>In Stock Qty:</strong> {{ txn.instockqty ?? '-' }}</p>
+          <p><strong>Dispatch Qty:</strong> {{ txn.dispatchqty ?? '-' }}</p>
+          <p><strong>Available Qty:</strong> {{ txn.availableqty ?? '-' }}</p>
+          <p><strong>Net Stock:</strong> {{ txn.netstock }}</p>
+          <p><strong>Buyer:</strong> {{ txn.buyername || 'N/A' }}</p>
+          <p><strong>Seller:</strong> {{ txn.sellername || 'N/A' }}</p>
+          <p><strong>Date:</strong> {{ txn.transdate | date: 'mediumDate' }}</p>
+          <p><strong>Total Price:</strong> ₹{{ txn.selltotalprice }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+  

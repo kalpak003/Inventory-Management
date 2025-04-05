@@ -1,17 +1,84 @@
-/* transaction-list.component.css */
+.product-container {
+  padding: 20px;
+}
+
+/* Header section with Add button */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.spacer {
+  flex-grow: 1;
+}
+
+.add-button {
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Responsive Grid Layout with Proper Spacing */
 .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px; /* Increased gap to prevent overlap */
+  margin-top: 20px;
+  justify-content: center;
+}
+
+/* Individual product card */
+.product-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  padding: 15px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid #ddd;
+  min-height: 180px; /* Ensures cards maintain equal height */
+  margin-bottom: 20px; /* Adds vertical spacing */
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Typography for mat-card sections */
+mat-card-title {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+mat-card-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+mat-card-content p {
+  font-size: 14px;
+  color: #444;
+  margin: 6px 0;
+}
+
+
+mat-spinner {
+  display: block;
+  margin: 40px auto;
+}
+
+@media (max-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
-  
-  .product-card {
-    cursor: pointer;
-    transition: transform 0.3s ease;
-  }
-  
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
+}

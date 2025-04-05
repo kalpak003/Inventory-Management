@@ -129,6 +129,6 @@ export class TransactionFormComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/dashboard/transaction']);
+    this.router.navigate(['/dashboard/products']);
   }
 }
